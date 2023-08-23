@@ -17,7 +17,7 @@ func main() {
 	// var err error
 	err := godotenv.Load(".env")
 
-    if err != nil {
+	if err != nil {
         log.Fatal("Error loading .env file:", err)
     }
     connStr := os.Getenv("DB_CONN_STRING")
@@ -62,6 +62,19 @@ type employee struct {
 
 //returns a list of EMPLOYEE from the database
 func getEmployee(c *gin.Context) {
+	connStr := os.Getenv("DB_CONN_STRING")
+    if connStr == "" {
+        log.Fatal("DB_CONN_STRING environment variable is not set")
+	}
+	db, err := sql.Open("postgres", connStr)
+
+    if err != nil {
+
+        log.Fatal("Failed to connect to PostgreSQL:", err)
+
+    }
+
+    defer db.Close()
 	fmt.Println("GETTING EMPLOYEE DATA")
 	c.Header("Content-Type", "application/json")
 	fmt.Println("h1")
