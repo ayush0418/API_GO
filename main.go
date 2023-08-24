@@ -36,7 +36,8 @@ func main() {
 	router.Run("localhost:8084")
 }
 
-
+/***EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE***/
+/***EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE******EMPLOYEE***/
 type employee struct {
 	Id int `json:"id"`
 	Name string `json:"name"`
@@ -96,7 +97,6 @@ func getEmployeeId(c *gin.Context) {
 			log.Fatal(err)
 		}
 	}
-	
 
 	c.IndentedJSON(http.StatusOK, e)
 }
@@ -197,7 +197,8 @@ func deleteEmployeeId(c *gin.Context) {
 	
 	
 
-
+/***MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER***/
+/***MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER******MANAGER***/
 type manager struct {
 	Id int `json:id"`
 	Name string `json:"name"`
