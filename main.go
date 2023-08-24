@@ -5,7 +5,8 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-
+	"os"
+	"github.com/joho/godotenv"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
@@ -13,12 +14,25 @@ import (
 var db *sql.DB
 
 func main() {
-	var err error
-	db, err = sql.Open("postgres", "postgres://postgres:mysecretpassword@localhost:5400/api_database?sslmode=disable")
+	// var err error
+	err := godotenv.Load(".env")
+
 	if err != nil {
-		log.Fatal(err)
+        log.Fatal("Error loading .env file:", err)
+    }
+    connStr := os.Getenv("DB_CONN_STRING")
+    if connStr == "" {
+        log.Fatal("DB_CONN_STRING environment variable is not set")
 	}
-	
+	db, err := sql.Open("postgres", connStr)
+
+    if err != nil {
+
+        log.Fatal("Failed to connect to PostgreSQL:", err)
+
+    }
+
+    defer db.Close()
 	router := gin.Default()
 
 	router.POST("/emp", createEmployee)
@@ -33,7 +47,7 @@ func main() {
 	router.GET("/manager", getManager)
 	router.GET("/manager/:id", getManagerId)
 
-	router.Run("localhost:8084")
+	router.Run("localhost:8086")
 }
 
 
@@ -48,13 +62,29 @@ type employee struct {
 
 //returns a list of EMPLOYEE from the database
 func getEmployee(c *gin.Context) {
+	connStr := os.Getenv("DB_CONN_STRING")
+    if connStr == "" {
+        log.Fatal("DB_CONN_STRING environment variable is not set")
+	}
+	db, err := sql.Open("postgres", connStr)
+
+    if err != nil {
+
+        log.Fatal("Failed to connect to PostgreSQL:", err)
+
+    }
+
+    defer db.Close()
 	fmt.Println("GETTING EMPLOYEE DATA")
 	c.Header("Content-Type", "application/json")
-
+	fmt.Println("h1")
 	rows, err := db.Query("SELECT * FROM employee")
+	fmt.Println("h2")
+
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("h3")
 
 	defer rows.Close()
 	var employees []employee
