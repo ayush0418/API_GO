@@ -21,7 +21,7 @@ func deleteAllEmployee(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	defer stmt.Close()
 	result, err := stmt.Exec()
 

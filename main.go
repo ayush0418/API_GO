@@ -14,21 +14,9 @@ func main() {
 	var err error
 	db, err = sql.Open("postgres", "postgres://postgres:mysecretpassword@localhost:5400/employee?sslmode=disable")
 	if err != nil {
-        log.Fatal("Error loading .env file:", err)
-    }
-    connStr := os.Getenv("DB_CONN_STRING")
-    if connStr == "" {
-        log.Fatal("DB_CONN_STRING environment variable is not set")
+		log.Fatal(err)
 	}
-	db, err := sql.Open("postgres", connStr)
 
-    if err != nil {
-
-        log.Fatal("Failed to connect to PostgreSQL:", err)
-
-    }
-
-    defer db.Close()
 	router := gin.Default()
 
 	router.POST("/emp", createEmployee)
@@ -41,12 +29,12 @@ func main() {
 }
 
 type employee struct {
-	Id int `json:"id"`
-	Name string `json:"name"`
-	TeamName string `json:"teamname"`
-	LeaveFrom string `json:"leavefrom"`
-	LeaveTo string `json:"leaveto"`
-	LeaveType string `json:"leavetype"`
-	Reporter string `json:"reporter"`
-	Attachment	[]byte `json:"attachment"`
+	Id         int    `json:"id"`
+	Name       string `json:"name"`
+	TeamName   string `json:"teamname"`
+	LeaveFrom  string `json:"leavefrom"`
+	LeaveTo    string `json:"leaveto"`
+	LeaveType  string `json:"leavetype"`
+	Reporter   string `json:"reporter"`
+	Attachment string `json:"attachment"`
 }

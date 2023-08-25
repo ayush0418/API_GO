@@ -13,21 +13,21 @@ import (
 func deleteEmployeeId(c *gin.Context) {
 	fmt.Println("DELETING EMPLOYEE DATA BY ID")
 	c.Header("Content-Type", "application/json")
-	
+
 	// Get the ID of the employee to be deleted
 	id := c.Param("id")
-	
+
 	// Delete the employee from the database
 	sqlStatement := `DELETE FROM employee WHERE id = $1;`
 	stmt, err := db.Prepare(sqlStatement)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer stmt.Close()
 	result, err := stmt.Exec(id)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}

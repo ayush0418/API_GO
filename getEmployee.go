@@ -9,8 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-
-//returns a list of EMPLOYEE from the database
+// returns a list of EMPLOYEE from the database
 func getEmployee(c *gin.Context) {
 	fmt.Println("GETTING EMPLOYEE DATA")
 	c.Header("Content-Type", "application/json")

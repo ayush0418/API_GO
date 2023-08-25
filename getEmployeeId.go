@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -10,7 +10,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// returns a row of EMPLOYEE from the database according to the id 
+// returns a row of EMPLOYEE from the database according to the id
 func getEmployeeId(c *gin.Context) {
 	fmt.Println("GETTING EMPLOYEE ID DATA")
 	c.Header("Content-Type", "application/json")
@@ -21,10 +21,10 @@ func getEmployeeId(c *gin.Context) {
 	// Query the database for the employee with the given ID
 	sqlStatement := `SELECT * FROM employee WHERE id=$1;`
 
-	row := db.QueryRow(sqlStatement,id)
+	row := db.QueryRow(sqlStatement, id)
 	var e employee
 	err := row.Scan(&e.Id, &e.Name, &e.TeamName, &e.LeaveFrom, &e.LeaveTo, &e.LeaveType, &e.Reporter, &e.Attachment)
-	
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.AbortWithStatus(http.StatusNotFound)
