@@ -2,49 +2,113 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
-// CREATING EMPLOYEE ENTRY IN THE DATABASE API_DATABASE, TABLE EMPLOYEE
+// CREATING EMPLOYEE ENTRY IN THE DATABASE EMPLOYEE, TABLE EMPLOYEE
 func createEmployee(c *gin.Context) {
 	fmt.Println("POSTING EMPLOYEE DATA")
-	var e employee
+	Id := c.PostForm("id")
+	Name := c.PostForm("emp_name")
+	TeamName := c.PostForm("team_name")
+	LeaveFrom := c.PostForm("leave_from")
+	LeaveTo := c.PostForm("leave_to")
+	LeaveType := c.PostForm("leave_type")
+	Reporter := c.PostForm("reporter")
 
-	if err := c.BindJSON(&e); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
-		return
+	if LeaveType == "Sick Leave" {
+		fmt.Println("With File Block")
+
+		fileHeader, err := c.FormFile("attachment")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		// Validate file size 15MB in bytes
+		if fileHeader.Size > 15*1024*1024 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "File size exceeds 15MB limit"})
+			return
+		}
+	
+		// Validate file extension
+		ext := filepath.Ext(fileHeader.Filename)
+		if ext != ".pdf" && ext != ".png" && ext != ".txt"{
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file extension. Only PDF and PNG are allowed."})
+			return
+		}
+
+		file, err := fileHeader.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		defer file.Close()
+
+		attachment, err := ioutil.ReadAll(file)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Saving uploaded file in the uploads directory
+		filename := filepath.Join("uploads", fileHeader.Filename)
+		err = saveFile(attachment, filename)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// saving the Form Data in the database
+		err = saveForm(Id, Name, TeamName, LeaveFrom, LeaveTo, LeaveType,Reporter, attachment)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Sucessfull With file"})
+	} else {
+		fmt.Println("Without File Block")
+
+		err := saveForm(Id, Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, nil)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Sucessfull Without file"})
 	}
+}
 
-	// Handle the uploaded file
-	file, err := c.FormFile("attachment")
+// saving the Form Data in the database
+func saveFile(data []byte, filename string) error {
+	err := os.MkdirAll(filepath.Dir(filename), os.ModePerm)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Attachment not provided"})
-		return
+		return err
 	}
 
-	// Save the file to a location (e.g., local directory or cloud storage)
-	// For example, you can save the file in a directory named "uploads"
-	filepath := "uploads/" + file.Filename
-	if err := c.SaveUploadedFile(file, filepath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error saving file"})
-		return
-	}
-
-	e.Attachment = filepath // Store the file path in the database
-
-	stmt, err := db.Prepare("INSERT INTO employee (id, emp_name, team_name, leave_from, leave_to, leave_type, reporter, attachment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
+	err = ioutil.WriteFile(filename, data, os.ModePerm)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	defer stmt.Close()
-	if _, err := stmt.Exec(e.Id, e.Name, e.TeamName, e.LeaveFrom, e.LeaveTo, e.LeaveType, e.Reporter, e.Attachment); err != nil {
-		log.Fatal(err)
+	return nil
+}
+
+// saving the Form Data in the database
+func saveForm(Id, Name, TeamName string, LeaveFrom, LeaveTo, LeaveType, Reporter string, attachment []byte) error {
+	var err error
+
+	_, err = db.Exec("INSERT INTO employee (id, emp_name, team_name, leave_from, leave_to, leave_type, reporter, attachment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+		Id, Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, attachment)
+	if err != nil {
+		return err
 	}
 
-	c.JSON(http.StatusCreated, e)
+	return nil
 }

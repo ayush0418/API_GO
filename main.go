@@ -25,7 +25,7 @@ func main() {
 	router.GET("/employee", getEmployee)
 	router.GET("/employee/:id", getEmployeeId)
 
-	router.Run("localhost:8084")
+	router.Run("localhost:8081")
 }
 
 type employee struct {
@@ -36,5 +36,5 @@ type employee struct {
 	LeaveTo    string `json:"leaveto"`
 	LeaveType  string `json:"leavetype"`
 	Reporter   string `json:"reporter"`
-	Attachment string `json:"attachment"`
+	Attachment []byte `json:"attachment"`
 }
