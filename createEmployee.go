@@ -14,7 +14,7 @@ import (
 // CREATING EMPLOYEE ENTRY IN THE DATABASE EMPLOYEE, TABLE EMPLOYEE
 func createEmployee(c *gin.Context) {
 	fmt.Println("POSTING EMPLOYEE DATA")
-	Id := c.PostForm("id")
+
 	Name := c.PostForm("emp_name")
 	TeamName := c.PostForm("team_name")
 	LeaveFrom := c.PostForm("leave_from")
@@ -65,7 +65,7 @@ func createEmployee(c *gin.Context) {
 		}
 
 		// saving the Form Data in the database
-		err = saveForm(Id, Name, TeamName, LeaveFrom, LeaveTo, LeaveType,Reporter, attachment)
+		err = saveForm(Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, attachment)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -75,7 +75,7 @@ func createEmployee(c *gin.Context) {
 	} else {
 		fmt.Println("Without File Block")
 
-		err := saveForm(Id, Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, nil)
+		err := saveForm(Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, nil)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -101,11 +101,11 @@ func saveFile(data []byte, filename string) error {
 }
 
 // saving the Form Data in the database
-func saveForm(Id, Name, TeamName string, LeaveFrom, LeaveTo, LeaveType, Reporter string, attachment []byte) error {
+func saveForm(Name, TeamName string, LeaveFrom, LeaveTo, LeaveType, Reporter string, attachment []byte) error {
 	var err error
 
-	_, err = db.Exec("INSERT INTO employee (id, emp_name, team_name, leave_from, leave_to, leave_type, reporter, attachment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-		Id, Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, attachment)
+	_, err = db.Exec("INSERT INTO employee (emp_name, team_name, leave_from, leave_to, leave_type, reporter, attachment) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+		Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, attachment)
 	if err != nil {
 		return err
 	}
