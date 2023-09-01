@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
-
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
@@ -18,7 +18,10 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.Use(cors.Default())
 
+	router.PUT("/employee/:id/approved", approveEmployee)
+	router.PUT("/employee/:id/rejected", rejectEmployee)
 	router.POST("/emp", createEmployee)
 	router.DELETE("/employee", deleteAllEmployee)
 	router.DELETE("/employee/:id", deleteEmployeeId)
@@ -37,4 +40,5 @@ type employee struct {
 	LeaveType  string `json:"leavetype"`
 	Reporter   string `json:"reporter"`
 	Attachment []byte `json:"attachment"`
+	Status string `json:"status"`
 }

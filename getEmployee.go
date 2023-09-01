@@ -24,7 +24,7 @@ func getEmployee(c *gin.Context) {
 
 	for rows.Next() {
 		var e employee
-		err := rows.Scan(&e.Id, &e.Name, &e.TeamName, &e.LeaveFrom, &e.LeaveTo, &e.LeaveType, &e.Reporter, &e.Attachment)
+		err := rows.Scan(&e.Id, &e.Name, &e.TeamName, &e.LeaveFrom, &e.LeaveTo, &e.LeaveType, &e.Reporter, &e.Attachment, &e.Status)
 		if err != nil {
 			log.Fatal(err)
 		}

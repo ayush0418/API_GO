@@ -23,7 +23,7 @@ func getEmployeeId(c *gin.Context) {
 
 	row := db.QueryRow(sqlStatement, id)
 	var e employee
-	err := row.Scan(&e.Id, &e.Name, &e.TeamName, &e.LeaveFrom, &e.LeaveTo, &e.LeaveType, &e.Reporter, &e.Attachment)
+	err := row.Scan(&e.Id, &e.Name, &e.TeamName, &e.LeaveFrom, &e.LeaveTo, &e.LeaveType, &e.Reporter, &e.Attachment, &e.Status)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
