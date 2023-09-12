@@ -65,7 +65,7 @@ func createEmployee(c *gin.Context) {
 		}
 
 		// saving the Form Data in the database
-		err = saveForm(Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, attachment)
+		err = saveForm(Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, filename)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -75,7 +75,7 @@ func createEmployee(c *gin.Context) {
 	} else {
 		fmt.Println("Without File Block")
 
-		err := saveForm(Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, nil)
+		err := saveForm(Name, TeamName, LeaveFrom, LeaveTo, LeaveType, Reporter, "nil")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -101,7 +101,7 @@ func saveFile(data []byte, filename string) error {
 }
 
 // saving the Form Data in the database
-func saveForm(Name, TeamName string, LeaveFrom, LeaveTo, LeaveType, Reporter string, attachment []byte) error {
+func saveForm(Name, TeamName string, LeaveFrom, LeaveTo, LeaveType, Reporter string, attachment string) error {
 	var err error
 
 	_, err = db.Exec("INSERT INTO employee (emp_name, team_name, leave_from, leave_to, leave_type, reporter, attachment) VALUES ($1, $2, $3, $4, $5, $6, $7)",

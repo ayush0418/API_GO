@@ -39,6 +39,6 @@ type employee struct {
 	LeaveTo    string `json:"leaveto"`
 	LeaveType  string `json:"leavetype"`
 	Reporter   string `json:"reporter"`
-	Attachment []byte `json:"attachment"`
+	Attachment string `json:"attachment"`
 	Status string `json:"status"`
 }
